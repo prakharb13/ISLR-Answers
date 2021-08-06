@@ -1,0 +1,1108 @@
+---
+title: "R Exam"
+author: "Prakhar Bansal"
+date: "8/1/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+```{r}
+rm(list=ls())
+library(MASS)
+library(ggplot2)
+?Boston
+```
+
+# Chapter 2 - Q10
+
+## a) 
+There are 506 rows and 14 columns in the Boston Housing dataset. Each row in the dataset represent a unique suburb in Boston and columns represent the characteristics of that suburb.
+
+ 
+```{r}
+pairs(Boston[,1:5],col='red',pch=21)
+```
+
+## b)
+As column indus increases zn descreases which shows that if area for business increases, it has a negative impact on residential lots. 
+
+```{r}
+pairs(Boston[,6:10],col='red',pch=21)
+```
+age and dis have an indirect relationship which means as weighted mean of distance to employment centres deacreases with the newly built homes. It shows that employment centers might have opened up after 1940s.
+
+```{r}
+pairs(Boston[,11:13],col='red',pch=21)
+```
+
+```{r}
+pairs(Boston[,c(1,6,7,8,9,10)],col='red',pch=21)
+```
+
+```{r}
+pairs(Boston[,c(1,11,12,13)],col='red',pch=21)
+```
+## c)
+```{r}
+cor(Boston$crim,Boston[-c(1)])
+
+par(mfrow=c(2,4))
+
+plot(Boston$crim,Boston$zn,col='red')
+plot(Boston$crim,Boston$nox,col='red')
+plot(Boston$crim,Boston$rm,col='red')
+plot(Boston$crim,Boston$age,col='red')
+plot(Boston$crim,Boston$ptratio,col='red')
+plot(Boston$crim,Boston$black,col='red')
+plot(Boston$crim,Boston$lstat,col='red')
+plot(Boston$crim,Boston$medv,col='red')
+
+
+```
+
+If there are large number of residential plots then crime tend tends to decrease substantially
+As distance to the employment centers increases, crime drops significantly
+Crime is higher for older properties
+
+
+## d)
+```{r}
+Boston[Boston$crim>(mean(Boston$crim)*2*sd(Boston$crim)),]
+cat('sd:',sd(Boston$crim),'mean:',mean(Boston$crim),
+    'range:',range(Boston$crim)) 
+```
+In 3 suburbs, per capita crime rate is higher than product of mean and s*standard_deviation. 
+Mean is only 3.613 which means the above 3 suburbs have very high crime rate
+
+```{r}
+Boston[Boston$tax>(mean(Boston$tax)*2*sd(Boston$tax)),]
+cat('sd:',sd(Boston$tax),'mean:',mean(Boston$tax),
+    'range:',range(Boston$tax)) 
+```
+There are no suburbs with very high tax rates i.e no suburb has value greater than mean*2sd.
+
+```{r}
+Boston[Boston$ptratio>(mean(Boston$ptratio)*2*sd(Boston$ptratio)),]
+cat('sd:',sd(Boston$ptratio),'mean:',mean(Boston$ptratio),
+    'range:',range(Boston$ptratio)) 
+```
+There are no suburbs with very high pupil teacher ratio. As the mean is 18 and sd is 2, few suburbs will have very low pt ratio.
+
+## e)
+```{r}
+table(Boston$chas)
+```
+35 suburbs in the dataset bound the Charles river
+
+## f)
+```{r}
+median(Boston$ptratio)
+```
+Median ratio is 19.05 which means 50% of the dataset has more than 19 pupil per teacher
+
+## g)
+```{r}
+Boston[Boston$medv==min(Boston$medv),]
+```
+```{r}
+sapply(Boston,range)
+```
+ 
+There are 2 suburbs with lowest median value of the property. 
+1. Per capita crime rate is very high for one of these suburbs as can been seen from the range of per capita crime rate.
+2. Proportion of blacks is also one of the highest in these suburbs.
+3. ptratio is on the higher end which shows that there are few teachers in these suburbs.
+4. All of the owner occupied homes in these suburbs are built prior to 1940 which explains the lowest median value.
+
+## h)
+```{r}
+dim(Boston[Boston$rm>7,])[1]
+```
+1. There are 64 suburbs with more than 7 rooms per dwelling on an average
+
+```{r}
+Boston[Boston$rm>8,]
+```
+
+There are 13 suburbs with more than 8 rooms per dwelling on an average. 
+Dwelling with more than 8 rooms generally have a higher cost. 
+Per capita crime rate is very low in these suburbs.
+
+
+
+# Chapter 3 - Q15
+
+```{r}
+model1 <- lm(crim~zn, Boston)
+summary(model1)
+
+
+plot(Boston$zn,Boston$crim,col='red')
+abline(model1$coefficients[1],model1$coefficients[2])
+```
+
+zn has a negative relationship(coefficient is -0.07) with the predictor - per capita crime rate
+The relationship is statistically significant as p-values is <.05
+The negative relationship can also be observed using the graph of zn and crim along with the regression line
+
+```{r}
+model2 <- lm(crim~indus, Boston)
+summary(model2)
+
+
+plot(Boston$indus,Boston$crim,col='red')
+abline(model2$coefficients[1],model2$coefficients[2])
+```
+
+indus has a positive relationship (coefficient is 0.509) with the predictor - per capita crime rate
+The relationship is statistically significant as p-value is <.05
+The positive relationship can also be observed using the graph of indus and crim along with the regression line
+
+```{r}
+model3 <- lm(crim~chas, Boston)
+summary(model3)
+
+
+plot(Boston$chas,Boston$crim,col='red')
+abline(model3$coefficients[1],model3$coefficients[2])
+```
+
+P-value of the predictor is 0.209 which implies that there is no significant relationship with the target 
+
+```{r}
+model4 <- lm(crim~nox, Boston)
+summary(model4)
+
+
+plot(Boston$nox,Boston$crim,col='red')
+abline(model4$coefficients[1],model4$coefficients[2])
+```
+
+nox has a positive relationship (coefficient is 31.249) with the predictor - per capita crime rate
+The relationship is statistically significant as p-value is <.05
+The positive relationship can also be observed using the graph of nox and crim along with the regression line
+
+```{r}
+model5 <- lm(crim~rm, Boston)
+summary(model5)
+
+
+plot(Boston$rm,Boston$crim,col='red')
+abline(model5$coefficients[1],model5$coefficients[2])
+```
+
+rm has a negative relationship (coefficient is -2.684) with the predictor - per capita crime rate
+The relationship is statistically significant as p-value is <.05
+The negative relationship can also be observed using the graph of rm and crim along with the regression line
+
+```{r}
+model6 <- lm(crim~age, Boston)
+summary(model6)
+
+
+plot(Boston$age,Boston$crim,col='red')
+abline(model6$coefficients[1],model6$coefficients[2])
+```
+
+age has a positive relationship (coefficient is 0.10779) with the predictor - per capita crime rate
+The relationship is statistically significant as p-value is <.05
+The positive relationship can also be observed using the graph of age and crim along with the regression line
+
+```{r}
+model7 <- lm(crim~dis, Boston)
+summary(model7)
+
+
+plot(Boston$dis,Boston$crim,col='red')
+abline(model7$coefficients[1],model7$coefficients[2])
+```
+
+dis has a negative relationship (coefficient is -1.55) with the predictor - per capita crime rate
+The relationship is statistically significant as p-value is <.05
+The negative relationship can also be observed using the graph of dis and crim along with the regression line
+
+```{r}
+model8 <- lm(crim~rad, Boston)
+summary(model8)
+
+
+plot(Boston$rad,Boston$crim,col='red')
+abline(model8$coefficients[1],model8$coefficients[2])
+```
+
+rad has a positive relationship (coefficient is 0.617) with the predictor - per capita crime rate
+The relationship is statistically significant as p-value is <.05
+The positive relationship can also be observed using the graph of rad and crim along with the regression line
+
+```{r}
+model9 <- lm(crim~tax, Boston)
+summary(model9)
+
+
+plot(Boston$tax,Boston$crim,col='red')
+abline(model9$coefficients[1],model9$coefficients[2])
+```
+
+tax has a positive relationship (coefficient is 0.02) with the predictor - per capita crime rate
+The relationship is statistically significant as p-value is <.05
+The positive relationship can also be observed using the graph of tax and crim along with the regression line
+
+```{r}
+model10 <- lm(crim~ptratio, Boston)
+summary(model10)
+
+
+plot(Boston$ptratio,Boston$crim,col='red')
+abline(model10$coefficients[1],model10$coefficients[2])
+```
+
+ptratio has a positive relationship (coefficient is 1.152) with the predictor - per capita crime rate
+The relationship is statistically significant as p-value is <.05
+The positive relationship can also be observed using the graph of ptratio and crim along with the regression line
+
+```{r}
+model11 <- lm(crim~black, Boston)
+summary(model11)
+
+
+plot(Boston$black,Boston$crim,col='red')
+abline(model11$coefficients[1],model11$coefficients[2])
+```
+
+black has a negative relationship (coefficient is -0.03) with the predictor - per capita crime rate
+The relationship is statistically significant as p-value is <.05
+The negative relationship can also be observed using the graph of black and crim along with the regression line
+
+```{r}
+model12 <- lm(crim~lstat, Boston)
+summary(model12)
+
+
+plot(Boston$lstat,Boston$crim,col='red')
+abline(model12$coefficients[1],model12$coefficients[2])
+```
+
+lstat has a positive relationship (coefficient is 0.5488) with the predictor - per capita crime rate
+The relationship is statistically significant as p-value is <.05
+The positive relationship can also be observed using the graph of lstat and crim along with the regression line
+
+```{r}
+model13 <- lm(crim~medv, Boston)
+summary(model13)
+
+
+plot(Boston$medv,Boston$crim,col='red')
+abline(model13$coefficients[1],model13$coefficients[2])
+```
+
+medv has a negative relationship (coefficient is -0.363) with the predictor - per capita crime rate
+The relationship is statistically significant as p-value is <.05
+The negative relationship can also be observed using the graph of medv and crim along with the regression line
+
+
+## b)
+```{r}
+mlp = lm(crim~.,data=Boston)
+summary(mlp)
+```
+
+Based on the summary statistic, we can reject the null hypothesis based on p-values of the beta coefficients. If p-value is greater than 5, we reject the null values.
+Following are the features which are statistically insignificant and hence we reject the null hypothesis:
+indus, chas, nox, rm, age, tax, ptratio, lstat
+
+## c)
+```{r}
+univariate_coeff <- c(model1$coefficients[2],model2$coefficients[2],model3$coefficients[2],model4$coefficients[2],model5$coefficients[2],model6$coefficients[2],model7$coefficients[2],model8$coefficients[2],model9$coefficients[2],model10$coefficients[2],model11$coefficients[2],model12$coefficients[2],model13$coefficients[2])
+
+multivariate_coeff <- c(mlp$coefficients)
+
+plot(univariate_coeff,multivariate_coeff[(2:14)],xlab='Univariate coeff', ylab='Multivariate coeff',col='red')
+```
+One of the features which had a coefficient of more than 30 in Simple Linear Regression changed to less than -10 in Multiple Linear Regression.
+
+## d)
+```{r}
+poly_model1 = lm(crim ~ poly(zn, 3, raw = TRUE), data = Boston) 
+summary(poly_model1)
+```
+
+```{r}
+poly_model1 = lm(crim ~ poly(indus, 3, raw = TRUE), data = Boston) 
+summary(poly_model1)
+```
+
+```{r}
+poly_model1 = lm(crim ~ poly(chas, 3, raw = TRUE), data = Boston) 
+summary(poly_model1)
+```
+
+```{r}
+poly_model1 = lm(crim ~ poly(nox, 3, raw = TRUE), data = Boston) 
+summary(poly_model1)
+```
+
+```{r}
+poly_model1 = lm(crim ~ poly(rm, 3, raw = TRUE), data = Boston) 
+summary(poly_model1)
+```
+
+```{r}
+poly_model1 = lm(crim ~ poly(age, 3, raw = TRUE), data = Boston) 
+summary(poly_model1)
+```
+
+```{r}
+poly_model1 = lm(crim ~ poly(dis, 3, raw = TRUE), data = Boston) 
+summary(poly_model1)
+```
+
+```{r}
+poly_model1 = lm(crim ~ poly(rad, 3, raw = TRUE), data = Boston) 
+summary(poly_model1)
+```
+
+```{r}
+poly_model1 = lm(crim ~ poly(tax, 3, raw = TRUE), data = Boston) 
+summary(poly_model1)
+```
+
+```{r}
+poly_model1 = lm(crim ~ poly(ptratio, 3, raw = TRUE), data = Boston) 
+summary(poly_model1)
+```
+
+```{r}
+poly_model1 = lm(crim ~ poly(black, 3, raw = TRUE), data = Boston) 
+summary(poly_model1)
+```
+
+```{r}
+poly_model1 = lm(crim ~ poly(lstat, 3, raw = TRUE), data = Boston) 
+summary(poly_model1)
+```
+
+```{r}
+poly_model1 = lm(crim ~ poly(medv, 3, raw = TRUE), data = Boston) 
+summary(poly_model1)
+```
+nox, medv, ptratio, dis and indus shows a non linear distribution with the target variable. All the coefficients of 1st, 2nd and 3rd order are statistically significant.
+age doesn't show linear relation with target but shows higher degree relation
+zn shows only a linear relationship with target
+
+# chapter 6 Q9
+```{r}
+library(ISLR)
+?College
+```
+
+## a)
+```{r}
+sample_size = sample(1:dim(College)[1],.75*nrow(College))
+College$Private_num = ifelse(College$Private=='Yes',1,0)
+train = College[sample_size,]
+test = College[-sample_size,]
+
+ind_cols = c("Private_num","Accept","Enroll","Top10perc","Top25perc"
+             ,"F.Undergrad","P.Undergrad"
+             ,"Outstate","Room.Board"
+             ,"Books","Personal"
+             ,"PhD","Terminal"
+             ,"S.F.Ratio","perc.alumni"
+             ,"Expend","Grad.Rate") 
+
+```
+
+Divided the College dataset into train and test.
+Train dataset contains 75% of the total rows and remaining rows are in test dataset.
+
+## b)
+```{r}
+set.seed(45)
+model = lm(Apps~Private_num+Accept+Enroll+Top10perc+Top25perc+F.Undergrad+P.Undergrad+Outstate+Room.Board+Books+Personal+PhD+Terminal+S.F.Ratio+perc.alumni+Expend+Grad.Rate,data=train)
+summary(model)
+plot(model)
+
+predicted = predict(model,test[-c(1,2)])
+
+rmse = sqrt(mean((test$Apps-predicted)^2))
+cat('RMSE on test Dataset:',rmse)
+```
+
+Multiple Linear Regression on Train dataset of College gives an Adj R-square of 92%.
+RMSE on test Dataset is 1040.815
+Features like Private, Accept, Enrol, Top10perc, Top25perc, F.Undergrad, Outstate, Phd, Expend, Grad.rate are statistically significant. 
+
+## c)
+```{r}
+library(glmnet)
+set.seed(45)
+train_x = model.matrix(~.-1,train[,ind_cols])
+model = cv.glmnet(train_x,train$Apps,data=train,alpha=0)
+summary(model)
+plot(model)
+test_x = model.matrix(~.-1,test[,ind_cols])
+predicted = predict(model,test_x)
+rmse = sqrt(mean((test$Apps-predicted)^2))
+cat('RMSE on test Dataset:',rmse)
+```
+
+Ridge Regression on training dataset gives an RMSE of 1246 on test dataset.
+
+## d)
+```{r}
+set.seed(45)
+train_x = model.matrix(~.-1,train[,ind_cols])
+model = cv.glmnet(train_x,train$Apps,data=train,alpha=1)
+summary(model)
+plot(model)
+test_x = model.matrix(~.-1,test[,ind_cols])
+predicted = predict(model,test_x)
+rmse = sqrt(mean((test$Apps-predicted)^2))
+cat('RMSE on test Dataset:',rmse)
+
+coefficients = coef(model, 'lambda.min')
+length_nonzero_coeff = length(coefficients[which(coefficients!=0)])
+```
+Lasso Regression on training dataset gives an RMSE of 1246 on test dataset.
+Total number of non-zero coefficients = ` length_nonzero_coeff `
+
+## e)
+```{r}
+set.seed(45)
+library(pls)
+pcr_model <- pcr(Apps~Private_num+Accept+Enroll+Top10perc+Top25perc+F.Undergrad+P.Undergrad+Outstate+Room.Board+Books+Personal+PhD+Terminal+S.F.Ratio+perc.alumni+Expend+Grad.Rate,data=train,  scale=TRUE, validation='CV')
+summary(pcr_model)
+plot(pcr_model)
+validationplot(pcr_model , val.type="MSEP",col='red')
+
+predicted = predict(pcr_model,test[,ind_cols],ncomp=7)
+rmse = sqrt(mean((test$Apps-predicted)^2))
+cat('RMSE on test Dataset:',rmse)
+```
+
+Based on validation plot, M is selected as 17 as it gives lowest MSEP. The same can be validated using the summary statistics of the pcr model
+
+## f)
+
+```{r}
+set.seed(45)
+library(pls)
+
+plsr_model <- plsr(Apps~Private_num+Accept+Enroll+Top10perc+Top25perc+F.Undergrad+P.Undergrad+Outstate+Room.Board+Books+Personal+PhD+Terminal+S.F.Ratio+perc.alumni+Expend+Grad.Rate,data=train,  scale=TRUE, validation='CV')
+summary(plsr_model)
+plot(plsr_model)
+
+validationplot(plsr_model , val.type="MSEP",col='red')
+
+predicted = predict(plsr_model,test[,ind_cols],ncomp=7)
+rmse = sqrt(mean((test$Apps-predicted)^2))
+cat('RMSE on test Dataset:',rmse)
+```
+
+Based on validation plot, M is selected as 16 as it gives lowest MSEP. The same can be validated using the summary statistics of the plsr model. CV error is same for both M=16 and 17
+
+## g)
+Based on rmse values, plsr model gives the best result and we can predict the applications received with much better accuracy.
+
+# Chapter 6 Q11
+ 
+## a)
+```{r}
+sample_size = sample(1:dim(Boston)[1],.75*nrow(Boston))
+train = Boston[sample_size,]
+test = Boston[-sample_size,]
+
+ind_cols = c("zn","indus","chas","nox","rm","age","dis","rad",  "tax","ptratio","black","lstat","medv") 
+```
+
+### Multiple Linear Regression
+```{r}
+set.seed(45)
+model = lm(crim~.,data=train)
+summary(model)
+plot(model)
+predicted = predict(model,test[,ind_cols])
+rmse = sqrt(mean((test$crim-predicted)^2))
+cat('RMSE on test Dataset:',rmse)
+```
+
+### Ridge Regression
+```{r}
+set.seed(45)
+train_x = model.matrix(~.-1,train[,ind_cols])
+model = cv.glmnet(train_x,train$crim,data=train,alpha=0)
+summary(model)
+plot(model)
+test_x = model.matrix(~.-1,test[,ind_cols])
+predicted = predict(model,test_x)
+rmse = sqrt(mean((test$crim-predicted)^2))
+cat('RMSE on test Dataset:',rmse)
+```
+
+### Lasso Regression
+```{r}
+set.seed(45)
+train_x = model.matrix(~.-1,train[,ind_cols])
+model = cv.glmnet(train_x,train$crim,data=train,alpha=1)
+summary(model)
+plot(model)
+
+test_x = model.matrix(~.-1,test[,ind_cols])
+predicted = predict(model,test_x)
+rmse = sqrt(mean((test$crim-predicted)^2))
+cat('RMSE on test Dataset:',rmse)
+```
+
+### PCR
+```{r}
+set.seed(45)
+pcr_model <- pcr(crim~.,data=train,  scale=TRUE, validation='CV')
+plot(pcr_model)
+
+predicted = predict(pcr_model,test[,ind_cols],ncomp=7)
+rmse = sqrt(mean((test$crim-predicted)^2))
+cat('RMSE on test Dataset:',rmse)
+```
+
+### PLS
+```{r}
+set.seed(45)
+plsr_model <- plsr(crim~.,data=train,  scale=TRUE, validation='CV')
+plot(plsr_model)
+predicted = predict(plsr_model,test[,ind_cols],ncomp=7)
+rmse = sqrt(mean((test$crim-predicted)^2))
+cat('RMSE on test Dataset:',rmse)
+```
+
+We have used Multiple Linear Regression, Ridge, Lasso, PCR and PLS techniques to predict crime rate in Boston
+
+## b)
+Out of the given model results, Multiple Linear Regression gives the best results based on RMSE on test dataset
+
+## c)
+In the final model selected which is the Multiple Linear Regression, we are choosing all the variables as part of the model.
+
+# Chapter 4 Q10
+
+## a)
+```{r}
+set.seed(45)
+summary(Weekly)
+
+cor(Weekly[,1:length(Weekly)-1])
+
+pairs(Weekly[,1:8],col='red')
+
+par(mfrow=c(2,4))
+hist(Weekly$Lag1,main='Lag1',col='red')
+hist(Weekly$Lag2,main='Lag2',col='red')
+hist(Weekly$Lag3,main='Lag3',col='red')
+hist(Weekly$Lag4,main='Lag4',col='red')
+hist(Weekly$Lag5,main='Lag5',col='red')
+hist(Weekly$Volume,main='Volume',col='red')
+hist(Weekly$Today,main='Today',col='red')
+hist(Weekly$Year,main='Year',col='red')
+```
+
+There appears to be a positive relationship between Year and Volume. With passing year, Volume increases. The same is validated with correlation matrix (.84)
+Based on Direction column, more weeks had a positive return(605) as compared to negative(484)
+
+## b)
+```{r}
+set.seed(45)
+library(glmnet)
+
+logistic_model <- glm(Direction~Lag1+Lag2+Lag3+Lag4+Lag5,data=Weekly,family=binomial)
+summary(logistic_model)
+plot(logistic_model)
+```
+Based on the p-values, only Lag2 seems to be statistically significant.
+
+## c)
+```{r}
+predicted_probs = predict(logistic_model,type='response')
+predicted = ifelse(predicted_probs<0.5,'Down','Up')
+
+print(table(Weekly$Direction,predicted))
+cat("\n")
+cat('Overal fraction of correct prediction:',(564+49)/(49+41+435+564))
+```
+
+Logistic Regression is not able to capture a lot of Down return weeks and misclassify it as Up.
+
+## d)
+```{r}
+set.seed(45)
+library(glmnet)
+train = Weekly[Weekly['Year']<=2008,]
+test =  Weekly[Weekly['Year']>2008,]
+
+logistic_model <- glm(Direction~Lag2,data=train,family=binomial)
+summary(logistic_model)
+
+predicted_probs = predict(logistic_model,test['Lag2'],type='response')
+predicted = ifelse(predicted_probs<0.5,'Down','Up')
+
+print(table(test$Direction,predicted))
+cat("\n")
+cat('Overal fraction of correct prediction:',(56+9)/(5+9+34+56))
+```
+
+## g)
+```{r}
+set.seed(45)
+library(kknn)
+knn_model <- kknn(Direction~Lag2,train=train,test=test,k=1)
+
+table(knn_model$fitted.values,test$Direction)
+cat("\n")
+cat('Overal fraction of correct prediction:',(30+22)/(21+31+30+22))
+```
+
+## h)
+Logistic Regression provides the best method for predictions as it is giving highest fraction of correct prediction.
+
+## i)
+## Knn with k=3
+```{r}
+set.seed(45)
+
+knn_model <- kknn(Direction~Lag2,train=train,test=test,k=3)
+
+table(knn_model$fitted.values,test$Direction)
+cat("\n")
+cat('Overal fraction of correct prediction:',(16+42)/(16+27+19+42))
+```
+
+KNN with K=3 gives better fraction of correct predictions which is 0.55
+
+## Knn with k=6
+```{r}
+set.seed(45)
+
+knn_model <- kknn(Direction~Lag2,train=train,test=test,k=6)
+
+table(knn_model$fitted.values,test$Direction)
+cat("\n")
+cat('Overal fraction of correct prediction:',(16+40)/(16+27+21+40))
+```
+
+KNN with K=3 gives better fraction of correct predictions which is 0.53
+
+## Logisitc Regression with Lag2+Lag2^2
+```{r}
+set.seed(45)
+library(glmnet)
+train = Weekly[Weekly['Year']<=2008,]
+test =  Weekly[Weekly['Year']>2008,]
+
+logistic_model <- glm(Direction~Lag2+Lag2*Lag2,data=train,family=binomial)
+
+predicted_probs = predict(logistic_model,test['Lag2'],type='response')
+predicted = ifelse(predicted_probs<0.5,'Down','Up')
+
+print(table(test$Direction,predicted))
+cat("\n")
+cat('Overal fraction of correct prediction:',(56+9)/(5+9+34+56))
+```
+
+## Logisitc Regression with Lag2*Lag2^2
+```{r}
+set.seed(45)
+library(glmnet)
+train = Weekly[Weekly['Year']<=2008,]
+test =  Weekly[Weekly['Year']>2008,]
+
+logistic_model <- glm(Direction~Lag2*Lag2,data=train,family=binomial)
+
+predicted_probs = predict(logistic_model,test['Lag2'],type='response')
+predicted = ifelse(predicted_probs<0.5,'Down','Up')
+
+print(table(test$Direction,predicted))
+cat("\n")
+cat('Overal fraction of correct prediction:',(56+9)/(5+9+34+56))
+```
+
+Interaction doesn;t have a significant effect on Logistic Regression when used the Significant lag2 variable.
+We can finalize Logistic Regression with which gives 62.5% accuracy.
+
+# Chapter 8 Q8
+## a)
+```{r}
+set.seed(45)
+library(ISLR)
+sample_size = sample(1:dim(Carseats)[1],.75*nrow(Carseats))
+train = Carseats[sample_size,]
+test = Carseats[-sample_size,]
+```
+
+Divided the Carseats dataset into Train and Test.
+Train has 75% of the total number of rows
+
+## b)
+```{r}
+library(tree)
+
+regression_tree_model <- tree(Sales~.,data=train)
+summary(regression_tree_model)
+
+plot(regression_tree_model)
+text(regression_tree_model,pretty=0,cex=0.65)
+
+yhat = predict(regression_tree_model,test[,-c(1)])
+cat("\n")
+cat('MSE on test Dataset:',mean((yhat - test$Sales)^2))
+```
+
+
+## c)
+```{r}
+library(tree)
+cv_tree_model <- cv.tree(regression_tree_model)
+plot(cv_tree_model,col='red')
+```
+
+Based on the cross-validation plot, the lowest Cv error is obtained at 5 terminal nodes.
+
+```{r}
+library(tree)
+prune_tree_model <- prune.tree(regression_tree_model,best = 5)
+
+yhat = predict(prune_tree_model,test[,-c(1)])
+cat("\n")
+cat('MSE on test Dataset:',mean((yhat - test$Sales)^2))
+```
+
+Test MSE for Pruned Tree is slightly lower than test mse obtained from Tree Regression model
+
+## d)
+```{r}
+library(randomForest)
+rf_model <- randomForest(Sales~.,data=train,mtry=10,importance=TRUE)
+rf_model
+
+yhat = predict(rf_model,test[,-c(1)])
+cat("\n")
+cat('MSE on test Dataset:',mean((yhat - test$Sales)^2))
+cat("\n")
+importance(rf_model)
+```
+
+The test MSE is lower than pruned regression tree. Bagging decreases the MSE significantly.
+Based on the importance function, The most important variables are: 
+1. Price 
+2. ShelveLoc
+3. CompPrice
+4. Income
+5. Advertising
+6. Age
+
+## e)
+```{r}
+set.seed(42)
+library(randomForest)
+rf_model1 <- randomForest(Sales~.,data=train,mtry=10,importance=TRUE)
+rf_model2 <- randomForest(Sales~.,data=train,mtry=5,importance=TRUE)
+rf_model3 <- randomForest(Sales~.,data=train,mtry=sqrt(10),importance=TRUE)
+rf_model4 <- randomForest(Sales~.,data=train,mtry=10/4,importance=TRUE)
+
+cat("Model 1: m=10")
+importance(rf_model1)
+cat("Model 1: m=5")
+importance(rf_model2)
+cat("Model 1: m=sqrt(10)")
+importance(rf_model3)
+cat("Model 1: m=10/4")
+importance(rf_model4)
+
+
+yhat1 = predict(rf_model1,test[,-c(1)])
+yhat2 = predict(rf_model2,test[,-c(1)])
+yhat3 = predict(rf_model3,test[,-c(1)])
+yhat4 = predict(rf_model4,test[,-c(1)])
+cat("\n")
+cat('MSE on test Dataset: rf_model1:',mean((yhat1 - test$Sales)^2))
+cat("\n")
+cat('MSE on test Dataset: rf_model1',mean((yhat2 - test$Sales)^2))
+cat("\n")
+cat('MSE on test Dataset: rf_model1',mean((yhat3 - test$Sales)^2))
+cat("\n")
+cat('MSE on test Dataset: rf_model1',mean((yhat4 - test$Sales)^2))
+cat("\n")
+```
+
+Top 2 Features obtained 4 different models of random forest (differed based on m) are the same: Price and Shelveloc
+
+MSE on test dataset is lowest for m=5
+
+# Chapter 8 Q11
+
+## a)
+```{r}
+train = Caravan[1:1000,]
+test = Caravan[1001:5822,]
+```
+
+The Caravan dataset is split into train and test. Training dataset contains 1000 rows and remaining rows are in test dataset.
+
+## b)
+```{r}
+library(gbm)
+set.seed(45)
+
+train$Purchase1 = rep(0,length(train$Purchase))
+train$Purchase1[train$Purchase=='Yes'] = 1
+
+train$AVRAAUT  = NULL
+train$PVRAAUT  = NULL
+
+gbm_boost=gbm(Purchase1~.-Purchase, data=train,       distribution="bernoulli", n.trees=1000, shrinkage=.01)
+summary(gbm_boost)
+```
+
+As GBM requires a binary target variable, converted Purchase column into Column1 with 1 and 0. 1 denoting Yes and 0 as No.
+As reported by gbm model, columns like PVRAAUT and AVRAAUT do not have variation and thus dropped them from the dataset.
+
+Based on the variable importance, PPERSAUT and MKOOPKLA are the most importance variables.
+
+## c)
+```{r}
+test$Purchase1 = rep(0,length(test$Purchase))
+test$Purchase1[test$Purchase=='Yes'] = 1
+
+test$AVRAAUT  = NULL
+test$PVRAAUT  = NULL
+
+yhat=predict(gbm_boost ,newdata =test[-c(84,85)],type='response')
+predicted = rep(0,length(test$Purchase1))
+predicted[yhat>0.2] = 1
+
+table(test$Purchase1,predicted)
+
+cat("\n")
+cat("Fraction of people predicted to make a purchase and actually make one:", 34/(34+123))
+cat("\n")
+cat("Accuracy:", (4410+34)/(4410+34+123+255))
+```
+
+Based on the confusion matrix obtained from gradient boosting model, model accuracy is 92% and precision is 21.6%
+
+## logistic Regression
+```{r}
+set.seed(45)
+
+train = Caravan[1:1000,]
+test = Caravan[1001:5822,]
+
+train$Purchase1 = rep(0,length(train$Purchase))
+train$Purchase1[train$Purchase=='Yes'] = 1
+
+train$AVRAAUT  = NULL
+train$PVRAAUT  = NULL
+train$Purchase = NULL
+
+logistic = glm(Purchase1~., data=train,family='binomial')
+
+test$Purchase1 = rep(0,length(test$Purchase))
+test$Purchase1[test$Purchase=='Yes'] = 1
+
+test$AVRAAUT  = NULL
+test$PVRAAUT  = NULL
+test$Purchase = NULL
+
+yhat=predict(logistic ,newdata =test,type='response')
+predicted = rep(0,length(test$Purchase1))
+predicted[yhat>0.2] = 1
+
+table(test$Purchase1,predicted)
+
+cat("\n")
+cat("Fraction of people predicted to make a purchase and actually make one:", 58/(58+350))
+cat("\n")
+cat("Accuracy:", (4183+58)/(58+231+4183+350))
+```
+
+Based on precision obtained from Gradient Boosting and logistic, We will finally choose Gradient Boosting as it has higher precision rate.
+
+# Problem 1
+## a)
+```{r}
+beauty_df = read.csv('BeautyData.csv')
+
+
+regression_model = lm(CourseEvals~.,data=beauty_df)
+summary(regression_model)
+
+plot(regression_model)
+
+cor(beauty_df)
+```
+1. Based on the Linear Regression output which has the CourseEvals as target variable and other features as predictors, we can see that all the predictors (BeautyScore, female, lower, nonenglish and tenuretrack) are statistically significant. All the predictor variables have p-value as less than 0.5.
+2. BeautyScore predictor has a beta coefficient as 0.30415 which means if we keep all other predictors as constant, positive increment in BeautyScore will give a positive increment in CourseEvals. So by this we can conclude a positive relationship between Course rating and beauty score.
+3. the same is validated using correlation matrix which gives a 40% positive correlation between CourseEvals and BeautyScore.
+
+## b)
+1. Dr. Harmesh wants to emphasize that the linear regression or correlation coefficient demonstrates the relationship but not the causality. We can never be 100% sure whether the BEautyScore causes uptick in course ratings. For example a very good looking person might also be a very good teacher or they work on their personality to look good. 
+2. The same can be explained using the confounding variable concept. The effect of BeautyScore on course eval could be because of other factors like eating healthy and working out which increases the BeautyScore but is also affecting CourseEvals.
+
+# Problem 2
+## a)
+```{r}
+midcity = read.csv('MidCity.csv')
+midcity$Nbhd = as.factor(midcity$Nbhd) 
+midcity$Brick_num = ifelse(midcity$Brick=='Yes',1,0) 
+set.seed(45)
+linear_regression_model = lm(Price~SqFt+Bedrooms+Offers+Bathrooms+Nbhd+Brick_num,data=midcity)
+
+summary(linear_regression_model)
+```
+
+Based on the regression output model, Brick_num is statistically significant variable and has beta coefficient - 15603.19. It signifies that if everything remains constant, Brick house will garner higher prices on the housing market.
+
+## b)
+```{r}
+summary(linear_regression_model)
+```
+
+There is a premium for neighborhood 3 as the beta coefficient in the linear regression model is positive and it is statistically significant.
+the beta estimate is 20681.
+
+## c)
+```{r}
+set.seed(45)
+
+nonlinear_regression_model = lm(Price~SqFt+Bedrooms+Offers+Bathrooms+Nbhd+Brick_num+Brick_num*Nbhd,data=midcity)
+
+summary(nonlinear_regression_model)
+```
+
+
+Bricknum feature contains 1 for Brick houses and 0 for non-brick houses.
+As can be seen from the model summary, interaction of Nbhd3 and brick_num is a statistically significant variable and gives a positive coefficient(11933). It means that there is an extra premium for brick houses in the neighborhood 3.
+
+
+```{r}
+set.seed(45)
+midcity$Nbhd = as.numeric(midcity$Nbhd)
+midcity$Nbhd_3 = ifelse(midcity$Nbhd==3,1,0)
+
+linear_regression_model = lm(Price~SqFt+Bedrooms+Offers+Bathrooms+Nbhd_3+Brick_num,data=midcity)
+
+summary(linear_regression_model)
+```
+
+by combining the two neighborhood (1 and 2 into Old), adj r square of the model has decreased as compared to the previoud model. 
+Hence we can conclude that combining the neighborhoods will negatively affect the predictability of the model.
+
+# Problem 3
+## a)
+To run regression of how 'Crime' is affected by number of Police, we will be unable to find the unbiased data. If a city has low crime rate, then there is no way a city will invest heavily in increasing the number of cops in the city. On the contrary, if there is a lot of street crime in the city (murder, assault, robbery etc.) then the city administration will not sit idle and decrease the number of cops in the city. They will inevitable increase the cops on the street. 
+
+Thus it is difficult to run an unbiased regression model of Crime on Police by just obtaining the data. It will shows us correlation effect but not the causality as both the features tend to move in the same direction
+
+## b)
+Researchers from Upenn university cleverly isolated this effect in Washington DC area. As it is highly prone to terrorism attacks, the city deploys a huge number of police personnel on the street when there is orange alert which is the alert for terrorism attack. These police personnel are in no way deployed to stop the street crime. However the researches notices that on orange alert days, street crime actually drops.
+
+The researchers from Upenn ran a model to check the effect of Crime and Police personnel on Orange Alert days. Based on table 2 and Column 1, we can see that the coefficient of High Alert is negative which implies that High Alert days is associated with low crime rates in the city. or in other words on orange alert days, large number of police personnel helps in reducing the street crime in the city. 
+
+## c)
+Column 2 of Table 2 add one more variable as Log(metro ridership) in the model. The researchers wanted to see if visitor (or potential victims of street crime) reduces on orange alert days. They checked this using Metro ridership data. The results that the researches saw was that the ridership did not decrease in Orange alert days but street crime incidents decreased. We can see from the model results also that if ridership is kept constant in the model, crime will still be reduced although slightly lower crime rate as compared to Column 1 model.
+
+## d)
+In the first column of Table 4, we are running a linear regression model with Crime in District 1 as target variable and 3 other features: 
+1. High Alert * District 1
+2. High Alert * other Districts
+3. Log(Midday Ridership)
+
+
+a) The first feature (High Alert * District 1) gives the impact of orange alert in District 1 on Crime rate of District 1. It is statistically significant and gives a large negative beta coefficient. Thus it impacts greatly on the crime rate of District 1 on high alert days.
+b) The second feature (High Alert * other Districts) is not statistically significant which means that the effect of orange alert and large police deployments in other districts do not have an effect on crime rate of District 1.
+c) The third feature Log(mid Day Ridership) is a statistically significant feature with a positive beta estimate. It implies that crime rate will increase with higher metro ridership (more victims). Including metro ridership in the model ensures that if we keep ridership constant, then there is inverse and statistically significant relationship between Orange Alert(high police deployment in District 1) and Crime rate in District 1.
+
+# Problem 4
+```{r}
+###standardize the train x's
+library(nnet)
+set.seed(45)
+minv = rep(0,13)
+maxv = rep(0,13)
+bostonsc = Boston
+for(i in 1:13) {
+minv[i] = min(Boston[[i+1]])
+maxv[i] = max(Boston[[i+1]])
+bostonsc[[i+1]] = (Boston[[i+1]]-minv[i])/(maxv[i]-minv[i])
+}
+final_size = NULL
+final_decay = NULL
+
+size_list = c(3,5,7,10)
+decay_list = c(.1,.001,.0001)
+k_folds = 5
+
+n_train = dim(Boston)[1]
+n0 = round(n_train/k_folds, 0)
+
+out_MSE = matrix(0, k_folds)
+train_cv_df = data.frame(matrix(nrow=0, ncol=3))
+
+
+for(size in size_list)
+  
+  for (decay in decay_list){
+  {
+  
+  used = NULL
+  set = 1:n_train
+  
+  for(j in 1:k_folds){
+    
+    if(n0<length(set)){val = sample(set,n0)}
+    if(n0>=length(set)){val=set}
+    
+    model = nnet(crim~.,bostonsc[-val,],size=size,decay=decay,trace=F)
+    bostonsc_test = bostonsc[,-c(1)]
+    prediction = predict(model, bostonsc[val,])
+
+    
+    out_MSE[j] = mean((prediction - (bostonsc[val,]$crim))^2)
+
+    
+    used = union(used,val)
+    set = (1:n_train)[-used]  
+  }
+  avg_rmse_os = mean(out_MSE)
+  final_size = size
+  final_decay = decay
+  
+  train_cv_df = rbind(train_cv_df,cbind(avg_rmse_os,final_size,final_decay))
+  
+  }
+  }
+cat("\n","\n")
+cat('Min MSE:',min(train_cv_df$avg_rmse_os),' and Size:',
+train_cv_df[which(train_cv_df$avg_rmse_os==min(train_cv_df$avg_rmse_os)),]$final_size
+,' and Decay:',
+train_cv_df[which(train_cv_df$avg_rmse_os==min(train_cv_df$avg_rmse_os)),]$final_decay)
+
+train_cv_df['hyparameter'] = paste(train_cv_df$final_size, train_cv_df$final_decay, sep="_")
+
+plot(train_cv_df$avg_rmse_os,train_cv_df$hyperparameter,xlab='hyperparameters',ylab='avg_rmse_oos',main='Comparison of Avg RMSE vs Hyperparameter',col='red')
+```
+
+Size is taken as (3,5,7,10)
+Decay is taken as (0.1, 0.001, 0.0001)
+K-folds = 5
+
+Based on K-fold cv and different hyperparameters, we get the least MSE for Size=3 and Decay=0.1
+
+# Problem 5
+I worked as part of the group to select an open source dataset and apply machine learning algorithms on it to predict a feature.
+I organized a team meeting of all the group members and discussed with everyone on their preference for a regression or classification algorithm. With everyone's consent, I finalized the USA based Car Dataset and finalized our target variable as Predicting Used Car Sale Price. The initial task of each member was to first analyze and clean the dataset in order to make better predictions. 
+
+I loaded the dataset in R and analyzed each and every variable (both univariate and multivariate analysis). I used ggplot in R to visualize features like lat-long of each car location. After our dataset was finalized and cleaned, I took up the task of building a Boosting model in R with various hyperparameters and K-Fold cross validation. After the final model building, I worked on creating slides of Boosting Regression model and Extrapolatory Data Analysis Slides. All the graphs and visualization were put into Data Analysis and Data Wrangling slides.
+
+At last, I and my team members held back to back virtual discussions on slides presentation and our learning from it. We practices different questions and solved each others doubts before the final presentation. My past experience as a Data Scientist helped me cotribute significantly towards our project in not just technical aspects but also in formulating the problem statement as well as providing crucial insights during the entire phase of the project. 
